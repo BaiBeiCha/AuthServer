@@ -1,0 +1,48 @@
+services:
+  auth-db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: auth
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U auth -d auth" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    networks:
+      - auth-network
+
+  auth-service:
+    build: .
+    ports:
+      - "9000:9000"
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth
+      DATASOURCE_USERNAME: auth
+      DATASOURCE_PASSWORD: auth
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 9000
+      APP_ROLES: "USER,ADMIN"
+      APP_ADMIN_USERNAME: admin
+      APP_ADMIN_PASSWORD: adminpassword
+      JWT_EXPIRATION: 86400000
+      JWT_REFRESH_EXPIRATION: 604800000
+      JWT_SECRET: 8N1G8WR0DCVY5ZSYONASE2MKlTXYSQ5UWQCS1K3K6WYUAH4OQN7Dlf9SWVSNWCTYBLLCJRNBXQPSQMA90RTSM46
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      EUREKA_CLIENT_REGISTER: "false"
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      USE_EUREKA: "false"
+      SERVICE_NAME: auth-service
+      USE_KAFKA: "false"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - auth-network
+
+networks:
+  auth-network:
+    driver: bridge

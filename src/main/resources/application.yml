@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: ${SERVICE_NAME:auth-server}
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable:
+          idempotence: true
+
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://auth-db:5432/auth}
+    username: ${DATASOURCE_USERNAME:auth}
+    password: ${DATASOURCE_PASSWORD:auth}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+
+server:
+  port: ${SERVER_PORT:9000}
+
+eureka:
+  client:
+    enabled: ${USE_EUREKA:false}
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER:false}
+    fetch-registry: false
+  instance:
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
+
+app:
+  roles:
+    - ${APP_ROLES:USER,ADMIN}
+  scopes:
+    - ${APP_SCOPES:READ,WRITE}
+  admin:
+    username: ${APP_ADMIN_USERNAME:admin}
+    password: ${APP_ADMIN_PASSWORD:adminpassword}
+  kafka:
+    user-register-topic: ${USER_REGISTER_TOPIC:user-registration}
+    enabled: ${USE_KAFKA:false}
+
+jwt:
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+  secret: ${JWT_SECRET:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}
