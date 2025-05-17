@@ -30,4 +30,9 @@ public class UserServiceWhenKafkaDisabled implements UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
+
+    @Override
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
 }

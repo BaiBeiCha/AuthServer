@@ -18,6 +18,7 @@ public class ScopeInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initScopes() {
+        appConfig.getScopes().addAll(appConfig.getStandardScopes());
         appConfig.getScopes().forEach(scopeName -> {
             if (!roleService.existsByName(scopeName)) {
                 Role role = new Role();

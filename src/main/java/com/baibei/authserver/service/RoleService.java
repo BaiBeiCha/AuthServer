@@ -8,4 +8,6 @@ public interface RoleService {
     Role save(Role role);
 
     boolean existsByName(String name);
+
+    void delete(Role role);
 }

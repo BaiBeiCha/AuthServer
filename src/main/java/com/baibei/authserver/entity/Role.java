@@ -29,4 +29,17 @@ public class Role {
     public static String role(String name) {
         return "ROLE_" + name.toUpperCase();
     }
+
+    @Override
+    public String toString() {
+        return role(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return name.equalsIgnoreCase(role.name);
+    }
 }

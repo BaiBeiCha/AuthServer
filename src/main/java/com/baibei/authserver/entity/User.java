@@ -75,4 +75,12 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
+    public boolean addScope(Scope scope) {
+        return scopes.add(scope);
+    }
+
+    public boolean removeScope(Scope scope) {
+        return scopes.remove(scope);
+    }
 }

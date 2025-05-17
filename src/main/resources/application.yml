@@ -11,7 +11,7 @@ spring:
           idempotence: true
 
   datasource:
-    url: ${DATASOURCE_URL:jdbc:postgresql://auth-db:5432/auth}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth}
     username: ${DATASOURCE_USERNAME:auth}
     password: ${DATASOURCE_PASSWORD:auth}
     driver-class-name: org.postgresql.Driver
@@ -37,7 +37,9 @@ app:
   roles:
     - ${APP_ROLES:USER,ADMIN}
   scopes:
-    - ${APP_SCOPES:READ,WRITE}
+    - ${APP_SCOPES:CHANGE_USERS,CHANGE_ROLES,CHANGE_SCOPES,CREATE_ADMIN,CREATE_BY}
+  permitted-roles:
+    - ${APP_ROLES_PERMITTED:USER}
   admin:
     username: ${APP_ADMIN_USERNAME:admin}
     password: ${APP_ADMIN_PASSWORD:adminpassword}

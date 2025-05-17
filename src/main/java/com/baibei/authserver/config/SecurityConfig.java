@@ -17,6 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import static com.baibei.authserver.entity.Role.role;
+import static com.baibei.authserver.entity.Scope.scope;
+
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
@@ -28,7 +31,43 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/auth/admin/register",
+                                "/api/auth/admin/register/**"
+                        )
+                        .hasAnyAuthority(
+                                role("ADMIN"),
+                                scope("CREATE_ADMIN")
+                        )
+
+                        .requestMatchers("/api/auth/admin/**")
+                        .hasAnyAuthority(
+                                role("ADMIN"),
+                                scope("CHANGE_USERS")
+                        )
+
+                        .requestMatchers(
+                                "/api/auth/admin/get/**",
+                                "/api/auth/admin/edit/**"
+                        ).hasAnyAuthority(
+                                role("ADMIN"),
+                                scope("CHANGE_USERS")
+                        )
+
+                        .requestMatchers(
+                                "/api/auth/admin/role/**"
+                        ).hasAnyAuthority(
+                                role("ADMIN"),
+                                scope("CHANGE_ROLES")
+                        )
+
+                        .requestMatchers(
+                                "/api/auth/admin/scope/**"
+                        ).hasAnyAuthority(
+                                role("ADMIN"),
+                                scope("CHANGE_SCOPES")
+                        )
+
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

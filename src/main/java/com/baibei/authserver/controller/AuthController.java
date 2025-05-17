@@ -1,18 +1,25 @@
 package com.baibei.authserver.controller;
 
-import com.baibei.authserver.dto.*;
+import com.baibei.authserver.config.AppConfig;
+import com.baibei.authserver.dto.AuthRequest;
+import com.baibei.authserver.dto.AuthResponse;
+import com.baibei.authserver.dto.RefreshTokenRequest;
+import com.baibei.authserver.dto.RegisterRequest;
+import com.baibei.authserver.dto.TokenIsExpiredRequest;
+import com.baibei.authserver.dto.UserDto;
 import com.baibei.authserver.entity.User;
 import com.baibei.authserver.mapper.UserMapper;
 import com.baibei.authserver.service.JwtService;
 import com.baibei.authserver.service.RefreshTokenService;
 import com.baibei.authserver.service.RoleService;
 import com.baibei.authserver.service.UserService;
-import com.baibei.authserver.service.kafka.producer.UserRegistrationProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +38,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final AppConfig appConfig;
 
     @PostMapping("/register")
     public UserDto register(@RequestBody RegisterRequest registerRequest) {
@@ -48,7 +56,10 @@ public class AuthController {
     public ResponseEntity<UserDto> registerByRole(
             @RequestBody RegisterRequest registerRequest, @RequestParam String role) {
         role = role.toUpperCase();
-        if (!roleService.existsByName(role) || role.contains("ADMIN")) {
+        if (!roleService.existsByName(role)) {
+            return ResponseEntity.status(404).build();
+        }
+        if (!appConfig.getRoles().contains(role)) {
             return ResponseEntity.status(403).build();
         }
 
@@ -106,5 +117,18 @@ public class AuthController {
     @PostMapping("/expired")
     public boolean expired(@RequestBody TokenIsExpiredRequest request) {
         return jwtService.isTokenExpired(request.getToken());
+    }
+
+    @GetMapping("/exists/{username}")
+    public boolean existsUser(@PathVariable String username) {
+        try {
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

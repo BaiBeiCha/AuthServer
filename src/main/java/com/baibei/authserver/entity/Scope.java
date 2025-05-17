@@ -30,4 +30,17 @@ public class Scope {
         user.getScopes().forEach((scope -> scopeBuilder.append(scope.getName()).append(",")));
         return scopeBuilder.deleteCharAt(scopeBuilder.length() - 1).toString();
     }
+
+    @Override
+    public String toString() {
+        return scope(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Scope scope = (Scope) o;
+        return name.equalsIgnoreCase(scope.name);
+    }
 }
