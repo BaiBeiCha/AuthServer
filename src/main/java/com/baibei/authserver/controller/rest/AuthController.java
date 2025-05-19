@@ -1,4 +1,4 @@
-package com.baibei.authserver.controller;
+package com.baibei.authserver.controller.rest;
 
 import com.baibei.authserver.config.AppConfig;
 import com.baibei.authserver.dto.AuthRequest;

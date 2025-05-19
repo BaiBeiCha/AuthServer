@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner">
+        <h1>Role Management</h1>
+        <a th:href="@{/admin}" class="back-link" aria-label="Back to Users">← Back to Users</a>
+    </header>
+
+    <main role="main">
+        <!-- Roles Table -->
+        <section class="card table-card" aria-labelledby="roles-table-title">
+            <h2 id="roles-table-title" class="sr-only">Existing Roles</h2>
+            <div class="table-responsive">
+                <table class="role-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Role Name</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="role : ${roles}">
+                        <td data-label="Role Name" th:text="${role.name}">ROLE_NAME</td>
+                        <td data-label="Actions">
+                            <form th:action="@{/admin/roles/delete}" method="post" class="inline-form">
+                                <input type="hidden" name="role" th:value="${role.name}" />
+                                <button
+                                        type="submit"
+                                        class="btn-icon btn-danger"
+                                        th:disabled="${role.name == 'ADMIN'}"
+                                        aria-label="Delete role [[${role.name}]]"
+                                        onclick="return confirm('Are you sure you want to delete the role ‘'+[[${role.name}]]+'’?')">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- New Role Form -->
+        <section class="card" aria-labelledby="create-role-title">
+            <h2 id="create-role-title">Create New Role</h2>
+            <form th:action="@{/admin/roles/new}" method="post" class="role-form" novalidate>
+                <fieldset class="form-group">
+                    <label for="new-role">Role Name</label>
+                    <input
+                            type="text"
+                            id="new-role"
+                            name="role"
+                            placeholder="Enter role name"
+                            required
+                            class="role-input"
+                    />
+                </fieldset>
+                <button type="submit" class="btn-primary" aria-label="Create role">Create Role</button>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

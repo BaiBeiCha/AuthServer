@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <main class="auth-wrapper" role="main" aria-labelledby="register-title">
+        <section class="auth-card" aria-describedby="register-desc">
+            <header class="auth-header">
+                <h1 id="register-title">Get Started</h1>
+                <p id="register-desc" class="auth-subtitle">Create your free account</p>
+            </header>
+
+            <!-- Error Message -->
+            <div th:if="${errorMessage}" class="alert alert-error" role="alert">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- Registration Form -->
+            <form th:action="@{/register}" th:object="${registerRequest}" method="post" novalidate>
+                <fieldset class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" th:field="*{username}" id="username" placeholder="Enter your username" required autofocus autocomplete="username" />
+                </fieldset>
+
+                <fieldset class="form-group">
+                    <label for="password">Password <span class="input-hint">(At least 8 characters)</span></label>
+                    <input type="password" th:field="*{password}" id="password" placeholder="Create a password" required minlength="8" autocomplete="new-password" />
+                </fieldset>
+
+                <button type="submit" class="btn-primary" aria-label="Create Account">Create Account</button>
+            </form>
+
+            <footer class="auth-footer">
+                <p>Already have an account? <a th:href="@{/login}" class="text-link">Sign in here</a></p>
+            </footer>
+        </section>
+    </main>
+</div>
+</body>
+</html>

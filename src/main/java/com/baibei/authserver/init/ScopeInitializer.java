@@ -1,30 +1,40 @@
 package com.baibei.authserver.init;
 
 import com.baibei.authserver.config.AppConfig;
-import com.baibei.authserver.entity.Role;
-import com.baibei.authserver.service.RoleService;
+import com.baibei.authserver.entity.Scope;
+import com.baibei.authserver.service.ScopeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ScopeInitializer {
 
-    private final RoleService roleService;
+    private final ScopeService scopeService;
     private final AppConfig appConfig;
-
 
     @EventListener(ApplicationReadyEvent.class)
     public void initScopes() {
+        StringBuilder scopesString = new StringBuilder();
+        AtomicBoolean init = new AtomicBoolean(false);
         appConfig.getScopes().addAll(appConfig.getStandardScopes());
         appConfig.getScopes().forEach(scopeName -> {
-            if (!roleService.existsByName(scopeName)) {
-                Role role = new Role();
-                role.setName(scopeName);
-                roleService.save(role);
+            if (!scopeService.existsByName(scopeName)) {
+                Scope scope = new Scope();
+                scope.setName(scopeName);
+                scopeService.save(scope);
+                scopesString.append(scopeName).append(",");
+                init.set(true);
             }
         });
+        if (init.get()) {
+            log.info("Initialized scopes: {}", scopesString.deleteCharAt(scopesString.length() - 1));
+        }
     }
 }

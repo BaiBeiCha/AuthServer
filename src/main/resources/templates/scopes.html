@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scope Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner">
+        <h1>Scope Management</h1>
+        <a th:href="@{/admin}" class="back-link" aria-label="Back to Users">← Back to Users</a>
+    </header>
+
+    <main role="main">
+        <!-- Scopes Table -->
+        <section class="card table-card" aria-labelledby="scopes-table-title">
+            <h2 id="scopes-table-title" class="sr-only">Existing Scopes</h2>
+            <div class="table-responsive">
+                <table class="scope-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Scope Name</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="scope : ${scopes}">
+                        <td data-label="Scope Name" th:text="${scope.name}">SCOPE_NAME</td>
+                        <td data-label="Actions">
+                            <form th:action="@{/admin/scopes/delete}" method="post" class="inline-form">
+                                <input type="hidden" name="scope" th:value="${scope.name}" />
+                                <button
+                                        type="submit"
+                                        class="btn-icon btn-danger"
+                                        th:disabled="${scope.name == 'ADMIN'}"
+                                        aria-label="Delete scope [[${scope.name}]]"
+                                        onclick="return confirm('Are you sure you want to delete the scope ‘'+[[${scope.name}]]+'’?')">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- New Scope Form -->
+        <section class="card" aria-labelledby="create-scope-title">
+            <h2 id="create-scope-title">Create New Scope</h2>
+            <form th:action="@{/admin/scopes/new}" method="post" class="scope-form" novalidate>
+                <fieldset class="form-group">
+                    <label for="new-scope">Scope Name</label>
+                    <input
+                            type="text"
+                            id="new-scope"
+                            name="scope"
+                            placeholder="Enter scope name"
+                            required
+                            class="scope-input"
+                    />
+                </fieldset>
+                <button type="submit" class="btn-primary" aria-label="Create scope">Create Scope</button>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

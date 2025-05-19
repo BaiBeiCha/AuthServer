@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit User</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <header class="header" role="banner">
+        <h2 class="page-title">
+            Редактировать пользователя: <span th:text="${userDto.username}" class="username"></span>
+        </h2>
+        <a th:href="@{/admin}" class="back-link" aria-label="Back to user list">← Назад к списку</a>
+    </header>
+
+    <main role="main">
+        <!-- User Details Form -->
+        <section class="card" aria-labelledby="user-form-title">
+            <h3 id="user-form-title" class="card-title">Основная информация</h3>
+            <form th:action="@{'/admin/edit/' + ${userDto.username}}" th:object="${userDto}" method="post">
+                <fieldset class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" th:field="*{username}" id="username" placeholder="Введите имя" required autofocus />
+                </fieldset>
+
+                <fieldset class="form-group">
+                    <label for="role">Роль</label>
+                    <select th:field="*{role}" id="role" class="role-select" required>
+                        <option th:each="role : ${allRoles}" th:value="${role}" th:text="${role}" th:selected="${role == userDto.role}"></option>
+                    </select>
+                </fieldset>
+
+                <button type="submit" class="btn-primary">Сохранить</button>
+            </form>
+        </section>
+
+        <!-- Scope Management -->
+        <section class="scope-management" aria-label="Scope management">
+            <!-- Add Scopes -->
+            <article class="card" aria-labelledby="add-scopes-title">
+                <h3 id="add-scopes-title" class="card-title">Добавить права</h3>
+                <form th:action="@{'/admin/edit/' + ${userDto.username} + '/addScopes'}" method="post">
+                    <fieldset class="form-group">
+                        <label for="addScopes">Доступные права</label>
+                        <select name="scopes" id="addScopes" multiple size="5" class="scope-select" aria-multiselectable="true" required>
+                            <option th:each="scope : ${allScopes}" th:value="${scope}" th:text="${scope}" th:if="${!userScopes.contains(scope)}"></option>
+                        </select>
+                    </fieldset>
+                    <button type="submit" class="btn-secondary">Добавить</button>
+                </form>
+            </article>
+
+            <!-- Remove Scopes -->
+            <article class="card" aria-labelledby="remove-scopes-title">
+                <h3 id="remove-scopes-title" class="card-title">Удалить права</h3>
+                <form th:action="@{'/admin/edit/' + ${userDto.username} + '/removeScopes'}" method="post">
+                    <fieldset class="form-group">
+                        <label for="removeScopes">Текущие права</label>
+                        <select name="scopes" id="removeScopes" multiple size="5" class="scope-select" aria-multiselectable="true" required>
+                            <option th:each="scope : ${allScopes}" th:value="${scope}" th:text="${scope}" th:if="${userScopes.contains(scope)}"></option>
+                        </select>
+                    </fieldset>
+                    <button type="submit" class="btn-danger">Удалить</button>
+                </form>
+            </article>
+        </section>
+    </main>
+
+</div>
+</body>
+</html>

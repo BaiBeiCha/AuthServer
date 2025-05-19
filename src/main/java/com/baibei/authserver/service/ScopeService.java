@@ -12,4 +12,6 @@ public interface ScopeService {
     boolean existsByName(String name);
 
     List<Scope> findAll();
+
+    void delete(Scope scope);
 }

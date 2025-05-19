@@ -7,11 +7,13 @@ import com.baibei.authserver.service.RoleService;
 import com.baibei.authserver.service.ScopeService;
 import com.baibei.authserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AdminInitializer {
@@ -26,6 +28,7 @@ public class AdminInitializer {
     public void initRoles() {
         if (!roleService.existsByName("ADMIN")) {
             roleService.save(new Role("ADMIN"));
+            log.info("Initialized role: ADMIN");
         }
 
         if (!userService.existsByUsername("admin")) {
@@ -35,6 +38,7 @@ public class AdminInitializer {
             user.setRole(roleService.findByName("ADMIN"));
             user.setScopes(scopeService.findAll());
             userService.save(user);
+            log.info("Initialized user: admin");
         }
     }
 }

@@ -35,4 +35,9 @@ public class ScopeServiceImpl implements ScopeService {
     public List<Scope> findAll() {
         return scopeRepository.findAll();
     }
+
+    @Override
+    public void delete(Scope scope) {
+        scopeRepository.delete(scope);
+    }
 }

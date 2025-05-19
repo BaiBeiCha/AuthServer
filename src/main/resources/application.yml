@@ -34,12 +34,9 @@ eureka:
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
 
 app:
-  roles:
-    - ${APP_ROLES:USER,ADMIN}
-  scopes:
-    - ${APP_SCOPES:CHANGE_USERS,CHANGE_ROLES,CHANGE_SCOPES,CREATE_ADMIN,CREATE_BY}
-  permitted-roles:
-    - ${APP_ROLES_PERMITTED:USER}
+  roles: ${APP_ROLES:USER,ADMIN}
+  scopes: ${APP_SCOPES:CHANGE_USERS,CHANGE_ROLES,CHANGE_SCOPES,CREATE_ADMIN,CREATE_BY}
+  permitted-roles: ${APP_ROLES_PERMITTED:USER}
   admin:
     username: ${APP_ADMIN_USERNAME:admin}
     password: ${APP_ADMIN_PASSWORD:adminpassword}

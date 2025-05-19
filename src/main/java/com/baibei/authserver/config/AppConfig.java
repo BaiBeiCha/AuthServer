@@ -8,19 +8,17 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.Set;
 
-import static com.baibei.authserver.entity.Scope.scope;
-
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "app")
 public class AppConfig {
 
     private final List<String> standardScopes = List.of(
-            scope("CHANGE_USERS"),
-            scope("CHANGE_ROLES"),
-            scope("CHANGE_SCOPES"),
-            scope("CREATE_ADMIN"),
-            scope("CREATE_BY")
+            "CHANGE_USERS",
+            "CHANGE_ROLES",
+            "CHANGE_SCOPES",
+            "CREATE_ADMIN",
+            "CREATE_BY"
     );
 
     private Set<String> roles;

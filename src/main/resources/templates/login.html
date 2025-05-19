@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <main class="auth-wrapper" role="main" aria-labelledby="login-title">
+        <section class="auth-card" aria-describedby="login-desc">
+            <header class="auth-header">
+                <h1 id="login-title">Welcome Back</h1>
+                <p id="login-desc">Please sign in to continue</p>
+            </header>
+
+            <form th:action="@{/login}" method="post" novalidate>
+                <!-- Feedback Messages -->
+                <div th:if="${errorMessage}" class="alert alert-error" role="alert">
+                    <p th:text="${errorMessage}">Invalid credentials</p>
+                </div>
+                <div th:if="${logoutMessage}" class="alert alert-success" role="status">
+                    <p th:text="${logoutMessage}">Logout successful</p>
+                </div>
+
+                <fieldset class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autofocus placeholder="Enter your username" />
+                </fieldset>
+
+                <fieldset class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="••••••••" />
+                </fieldset>
+
+                <button type="submit" class="btn-primary" aria-label="Sign in">Sign In</button>
+            </form>
+
+            <footer class="auth-footer">
+                <p>Don't have an account? <a th:href="@{/register}" class="text-link">Create account</a></p>
+            </footer>
+        </section>
+    </main>
+</div>
+</body>
+</html>

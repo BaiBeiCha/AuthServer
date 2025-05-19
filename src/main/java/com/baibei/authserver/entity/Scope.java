@@ -28,7 +28,10 @@ public class Scope {
     public static String generateScope(User user) {
         StringBuilder scopeBuilder = new StringBuilder();
         user.getScopes().forEach((scope -> scopeBuilder.append(scope.getName()).append(",")));
-        return scopeBuilder.deleteCharAt(scopeBuilder.length() - 1).toString();
+        if (!scopeBuilder.isEmpty()) {
+            scopeBuilder.deleteCharAt(scopeBuilder.length() - 1);
+        }
+        return scopeBuilder.toString();
     }
 
     @Override
