@@ -34,21 +34,17 @@ AuthServer/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── com/bai/beicha/authserver/  # Основной код приложения
-│   │   │       ├── config/                 # Конфигурации Spring Security и JWT
-│   │   │       ├── controller/             # REST контроллеры для API
-│   │   │       ├── dto/                    # Dto классы
-│   │   │       ├── entity/                 # Модели данных (например, User)
-│   │   │       ├── repository/             # Репозитории для работы с БД
-│   │   │       ├── service/                # Сервисный слой (логика аутентификации)
-│   │   │       └── AuthServerApplication.java # Точка входа в приложение
+│   │   │   └── com/bai/beicha/authserver/  	# Основной код приложения
+│   │   │       ├── config/                 	# Конфигурации Spring Security и JWT
+│   │   │       ├── controller/             	# REST контроллеры для API
+│   │   │       ├── dto/                    	# Dto классы
+│   │   │       ├── entity/                 	# Модели данных (например, User)
+│   │   │       ├── repository/             	# Репозитории для работы с БД
+│   │   │       ├── service/                	# Сервисный слой (логика аутентификации)
+│   │   │       └── AuthServerApplication.java 	# Точка входа в приложение
 │   │   └── resources/
-│   │       └── application.yml            # Конфигурационные файлы
-├── Dockerfile                             # Инструкция для сборки Docker образа
-├── docker-compose.yml                     # Конфигурация для запуска контейнеров
-├── build.gradle                           # Скрипт сборки Gradle
-├── gradlew, gradlew.bat                   # Скрипты запуска Gradle
-└── settings.gradle                        # Настройки Gradle
+│   │       └── application.yml            	# Конфигурационные файлы
+└── build.gradle                          	# Скрипт сборки Gradle
 ```
 
 ---
