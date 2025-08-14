@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -19,7 +20,7 @@ public class WebAuthController {
     private final UserService userService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
-    private final AppConfig appConfig;
+    private final AppConfig.Locale locale;
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error,
@@ -31,20 +32,31 @@ public class WebAuthController {
         if (logout != null) {
             model.addAttribute("logoutMessage", "You have been logged out successfully");
         }
-        return "login";
+
+        return switch (locale) {
+            case RU -> "ru/login";
+            case EN -> "en/login";
+            default -> "en/login";
+        };
     }
 
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
-        return "register";
+
+        return switch (locale) {
+            case RU -> "ru/register";
+            case EN -> "en/register";
+            default -> "en/register";
+        };
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute RegisterRequest registerRequest, Model model) {
+    public String registerUser(@ModelAttribute RegisterRequest registerRequest,
+                               RedirectAttributes redirectAttributes) {
         if (userService.existsByUsername(registerRequest.getUsername())) {
-            model.addAttribute("errorMessage", "Username is already taken");
-            return "register";
+            redirectAttributes.addAttribute("errorMessage", "Username is already taken");
+            return "redirect:/register";
         }
 
         User user = new User();

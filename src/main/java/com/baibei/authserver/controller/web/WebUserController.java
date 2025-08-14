@@ -1,5 +1,6 @@
 package com.baibei.authserver.controller.web;
 
+import com.baibei.authserver.config.AppConfig;
 import com.baibei.authserver.dto.UserDto;
 import com.baibei.authserver.entity.User;
 import com.baibei.authserver.mapper.UserMapper;
@@ -9,7 +10,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -19,26 +24,33 @@ public class WebUserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final AppConfig.Locale locale;
 
     @GetMapping
     public String profilePage(Authentication authentication, Model model) {
         String username = authentication.getName();
-        System.out.println(username);
         User user = userService.findByUsername(username);
         UserDto userDto = userMapper.toDto(user);
         model.addAttribute("userDto", userDto);
-        return "profile";
+
+        return switch (locale) {
+            case RU -> "ru/profile";
+            case EN -> "en/profile";
+            default -> "en/profile";
+        };
     }
 
     @PostMapping
     public String updateProfile(@ModelAttribute UserDto userDto,
                                 Authentication authentication,
-                                Model model) {
+                                RedirectAttributes redirectAttributes) {
         String authUsername = authentication.getName();
 
         if (!authUsername.equals(userDto.getUsername())) {
-            model.addAttribute("errorMessage", "You can only edit your own profile");
-            return "profile";
+            redirectAttributes.addAttribute(
+                    "errorMessage",
+                    "You can only edit your own profile");
+            return "redirect:/profile";
         }
 
         User user = userService.findByUsername(authUsername);
@@ -53,10 +65,14 @@ public class WebUserController {
 
         userService.save(user);
 
-        model.addAttribute("successMessage", "Profile updated successfully");
-        model.addAttribute("userDto", userMapper.toDto(user));
+        redirectAttributes.addAttribute(
+                "successMessage",
+                "Profile updated successfully");
+        redirectAttributes.addAttribute(
+                "userDto",
+                userMapper.toDto(user));
 
-        return "profile";
+        return "redirect:/profile";
     }
 
     @PostMapping("/delete")
@@ -64,7 +80,6 @@ public class WebUserController {
         String username = authentication.getName();
         User user = userService.findByUsername(username);
         userService.delete(user);
-
         return "redirect:/login?accountDeleted";
     }
 }

@@ -1,0 +1,89 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Role Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="roles-title">
+        <h1 id="roles-title">Role Management</h1>
+        <a th:href="@{/admin}" class="btn btn-ghost" role="button" aria-label="Back to users">← Back to Users</a>
+    </header>
+
+    <main role="main">
+        <section class="card table-card" aria-labelledby="existing-roles">
+            <h2 id="existing-roles" class="sr-only">Existing roles</h2>
+            <div class="table-responsive" role="region" aria-live="polite">
+                <table class="table" aria-describedby="roles-desc">
+                    <caption id="roles-desc" class="sr-only">List of roles and actions</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Role Name</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="role : ${roles}">
+                        <td data-label="Role Name" th:text="${role.name}">ROLE_NAME</td>
+                        <td data-label="Actions" class="actions-cell">
+                            <form th:action="@{/admin/roles/delete}" method="post" class="inline-form"
+                                  onsubmit="return confirmDeleteRole(this, '[[${role.name}]]')">
+                                <input type="hidden" name="role" th:value="${role.name}">
+                                <button
+                                        type="submit"
+                                        class="icon-btn icon-danger"
+                                        th:disabled="${role.name == 'ADMIN'}"
+                                        aria-label="Delete role [[${role.name}]]">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" style="margin-top:1rem" aria-labelledby="create-role">
+            <h2 id="create-role">Create New Role</h2>
+            <form th:action="@{/admin/roles/new}" method="post" class="role-form" novalidate
+                  onsubmit="return validateNewRole(this)">
+                <div class="form-group">
+                    <label for="new-role">Role Name</label>
+                    <input id="new-role" name="role" type="text" placeholder="Enter role name (e.g. MANAGER)" required
+                           class="role-input" aria-required="true" autofocus>
+                </div>
+
+                <div style="margin-top:.5rem">
+                    <button type="submit" class="btn btn-primary" aria-label="Create role">Create Role</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    function confirmDeleteRole(form, roleName) {
+        if (roleName === 'ADMIN') {
+            alert('The ADMIN role is protected and cannot be deleted.');
+            return false;
+        }
+        return confirm('Delete role "' + roleName + '"? This action is irreversible.');
+    }
+
+    function validateNewRole(form) {
+        const input = form.querySelector('input[name="role"]');
+        const v = (input.value || '').trim();
+        if (v.length < 2) {
+            alert('Enter a valid role name (at least 2 characters).');
+            input.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

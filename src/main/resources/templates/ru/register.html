@@ -1,0 +1,76 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Создать аккаунт</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-wrapper container">
+    <section class="auth-card" aria-labelledby="reg-title" role="main">
+        <header class="auth-header">
+            <h1 id="reg-title">Создать аккаунт</h1>
+            <p class="auth-subtitle">Начните с бесплатного аккаунта</p>
+        </header>
+
+        <div th:if="${errorMessage}" class="alert alert-error" role="alert" aria-live="assertive">
+            <p th:text="${errorMessage}">Произошла ошибка</p>
+        </div>
+
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post" novalidate
+              onsubmit="return checkRegister(this)">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input id="username" th:field="*{username}" name="username" type="text" required autocomplete="username"
+                       placeholder="ваше.имя.пользователя" aria-required="true" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль <span class="small">(мин. 8 символов)</span></label>
+                <div class="input-row" style="align-items:center">
+                    <input id="password" th:field="*{password}" name="password" type="password" minlength="8" required
+                           autocomplete="new-password" placeholder="Придумайте надежный пароль" aria-required="true">
+                    <button type="button" class="btn btn-ghost" onclick="togglePassword('password')"
+                            aria-label="Переключить видимость пароля">👁️
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top:.5rem">
+                <button type="submit" class="btn btn-primary" aria-label="Создать аккаунт">Создать аккаунт</button>
+            </div>
+        </form>
+
+        <footer class="auth-footer" style="margin-top:1rem">
+            <p class="small">Уже есть аккаунт? <a th:href="@{/login}" class="text-link">Войти</a></p>
+        </footer>
+    </section>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.type = el.type === 'password' ? 'text' : 'password';
+        el.focus();
+    }
+
+    function checkRegister(form) {
+        const username = (form.username.value || '').trim();
+        const pwd = form.password.value || '';
+        if (username.length < 1) {
+            alert('Введите имя пользователя');
+            form.username.focus();
+            return false;
+        }
+        if (pwd.length < 8) {
+            alert('Пароль должен быть не менее 8 символов');
+            form.password.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Scope Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="scopes-title">
+        <h1 id="scopes-title">Scope Management</h1>
+        <a th:href="@{/admin}" class="btn btn-ghost" role="button" aria-label="Back to users">← Back to Users</a>
+    </header>
+
+    <main role="main">
+        <section class="card table-card" aria-labelledby="existing-scopes">
+            <h2 id="existing-scopes" class="sr-only">Existing scopes</h2>
+            <div class="table-responsive" role="region" aria-live="polite">
+                <table class="table" aria-describedby="scopes-desc">
+                    <caption id="scopes-desc" class="sr-only">List of available scopes</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Scope Name</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="scope : ${scopes}">
+                        <td data-label="Scope Name" th:text="${scope.name}">SCOPE_NAME</td>
+                        <td data-label="Actions" class="actions-cell">
+                            <form th:action="@{/admin/scopes/delete}" method="post" class="inline-form"
+                                  onsubmit="return confirmDeleteScope(this, '[[${scope.name}]]')">
+                                <input type="hidden" name="scope" th:value="${scope.name}">
+                                <button
+                                        type="submit"
+                                        class="icon-btn icon-danger"
+                                        th:disabled="${scope.name == 'ADMIN'}"
+                                        aria-label="Delete scope [[${scope.name}]]">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" style="margin-top:1rem" aria-labelledby="create-scope">
+            <h2 id="create-scope">Create New Scope</h2>
+            <form th:action="@{/admin/scopes/new}" method="post" class="scope-form" novalidate
+                  onsubmit="return validateNewScope(this)">
+                <div class="form-group">
+                    <label for="new-scope">Scope Name</label>
+                    <input id="new-scope" name="scope" type="text" placeholder="Enter scope name (e.g. READ_USERS)"
+                           required class="scope-input" aria-required="true" autofocus>
+                    <span class="small muted">Use a clear, namespaced name like <code>READ_USERS</code> or <code>MANAGE_ROLES</code>.</span>
+                </div>
+
+                <div style="margin-top:.5rem">
+                    <button type="submit" class="btn btn-primary" aria-label="Create scope">Create Scope</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    function confirmDeleteScope(form, scopeName) {
+        if (scopeName === 'ADMIN') {
+            alert('The ADMIN scope is protected and cannot be deleted.');
+            return false;
+        }
+        return confirm('Delete scope "' + scopeName + '"? This action is irreversible and may affect user permissions.');
+    }
+
+    function validateNewScope(form) {
+        const input = form.querySelector('input[name="scope"]');
+        const v = (input.value || '').trim();
+        if (v.length < 3) {
+            alert('Enter a valid scope name (at least 3 characters).');
+            input.focus();
+            return false;
+        }
+        input.value = v.toLowerCase();
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Create account</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-wrapper container">
+    <section class="auth-card" aria-labelledby="reg-title" role="main">
+        <header class="auth-header">
+            <h1 id="reg-title">Create account</h1>
+            <p class="auth-subtitle">Start with a free account</p>
+        </header>
+
+        <div th:if="${errorMessage}" class="alert alert-error" role="alert" aria-live="assertive">
+            <p th:text="${errorMessage}">There was a problem</p>
+        </div>
+
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post" novalidate
+              onsubmit="return checkRegister(this)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" th:field="*{username}" name="username" type="text" required autocomplete="username"
+                       placeholder="your.username" aria-required="true" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password <span class="small">(min 8 characters)</span></label>
+                <div class="input-row" style="align-items:center">
+                    <input id="password" th:field="*{password}" name="password" type="password" minlength="8" required
+                           autocomplete="new-password" placeholder="Create a secure password" aria-required="true">
+                    <button type="button" class="btn btn-ghost" onclick="togglePassword('password')"
+                            aria-label="Toggle password visibility">👁️
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top:.5rem">
+                <button type="submit" class="btn btn-primary" aria-label="Create account">Create account</button>
+            </div>
+        </form>
+
+        <footer class="auth-footer" style="margin-top:1rem">
+            <p class="small">Already have an account? <a th:href="@{/login}" class="text-link">Sign in</a></p>
+        </footer>
+    </section>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.type = el.type === 'password' ? 'text' : 'password';
+        el.focus();
+    }
+
+    function checkRegister(form) {
+        const username = (form.username.value || '').trim();
+        const pwd = form.password.value || '';
+        if (username.length < 1) {
+            alert('Enter username');
+            form.username.focus();
+            return false;
+        }
+        if (pwd.length < 8) {
+            alert('Password must be at least 8 characters');
+            form.password.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

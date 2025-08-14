@@ -25,6 +25,14 @@ public class Scope {
         return "SCOPE_" + name.toUpperCase();
     }
 
+    public static String[] scopes(String... names) {
+        String[] scopes = new String[names.length];
+        for (int i = 0; i < names.length; i++) {
+            scopes[i] = scope(names[i]);
+        }
+        return scopes;
+    }
+
     public static String generateScope(User user) {
         StringBuilder scopeBuilder = new StringBuilder();
         user.getScopes().forEach((scope -> scopeBuilder.append(scope.getName()).append(",")));

@@ -1,8 +1,9 @@
-package com.baibei.authserver.init;
+package com.baibei.authserver.initializer;
 
 import com.baibei.authserver.config.AppConfig;
 import com.baibei.authserver.entity.Role;
 import com.baibei.authserver.service.RoleService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,6 +19,9 @@ public class RoleInitializer {
 
     private final RoleService roleService;
     private final AppConfig appConfig;
+
+    @Getter
+    private boolean initialized = false;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initRoles() {
@@ -35,5 +39,6 @@ public class RoleInitializer {
         if (init.get()) {
             log.info("Initialized roles: {}", rolesString.deleteCharAt(rolesString.length() - 1));
         }
+        initialized = init.get();
     }
 }

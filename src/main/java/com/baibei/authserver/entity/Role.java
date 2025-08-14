@@ -30,6 +30,14 @@ public class Role {
         return "ROLE_" + name.toUpperCase();
     }
 
+    public static String[] roles(String... names) {
+        String[] roles = new String[names.length];
+        for (int i = 0; i < names.length; i++) {
+            roles[i] = role(names[i]);
+        }
+        return roles;
+    }
+
     @Override
     public String toString() {
         return role(name);

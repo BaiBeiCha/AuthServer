@@ -1,4 +1,4 @@
-package com.baibei.authserver.controller.rest;
+package com.baibei.authserver.controller.api;
 
 import com.baibei.authserver.dto.RegisterRequest;
 import com.baibei.authserver.dto.UserDto;

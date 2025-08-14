@@ -34,17 +34,26 @@ eureka:
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
 
 app:
+  locale: ${APP_LOCALE:EN}
   roles: ${APP_ROLES:USER,ADMIN}
   scopes: ${APP_SCOPES:CHANGE_USERS,CHANGE_ROLES,CHANGE_SCOPES,CREATE_ADMIN,CREATE_BY}
   permitted-roles: ${APP_ROLES_PERMITTED:USER}
   admin:
     username: ${APP_ADMIN_USERNAME:admin}
     password: ${APP_ADMIN_PASSWORD:adminpassword}
+  users:
+    - username: user
+      password: user
+      role: USER
+      scopes: CHANGE_USERS,CREATE_BY
   kafka:
     user-register-topic: ${USER_REGISTER_TOPIC:user-registration}
     enabled: ${USE_KAFKA:false}
 
 jwt:
-  expiration: ${JWT_EXPIRATION:86400000}
-  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+  expiration: ${JWT_EXPIRATION:1h}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:5d}
   secret: ${JWT_SECRET:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}
+
+time-parser:
+  separator: ${TIME_SEPARATOR:}

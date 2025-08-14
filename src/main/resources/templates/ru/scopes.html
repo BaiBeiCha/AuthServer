@@ -1,0 +1,91 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Управление правами</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="scopes-title">
+        <h1 id="scopes-title">Управление правами</h1>
+        <a th:href="@{/admin}" class="btn btn-ghost" role="button" aria-label="Назад к пользователям">← Назад к пользователям</a>
+    </header>
+
+    <main role="main">
+        <section class="card table-card" aria-labelledby="existing-scopes">
+            <h2 id="existing-scopes" class="sr-only">Существующие права</h2>
+            <div class="table-responsive" role="region" aria-live="polite">
+                <table class="table" aria-describedby="scopes-desc">
+                    <caption id="scopes-desc" class="sr-only">Список доступных прав (scopes)</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Название права</th>
+                        <th scope="col">Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="scope : ${scopes}">
+                        <td data-label="Название права" th:text="${scope.name}">SCOPE_NAME</td>
+                        <td data-label="Действия" class="actions-cell">
+                            <form th:action="@{/admin/scopes/delete}" method="post" class="inline-form"
+                                  onsubmit="return confirmDeleteScope(this, '[[${scope.name}]]')">
+                                <input type="hidden" name="scope" th:value="${scope.name}">
+                                <button
+                                        type="submit"
+                                        class="icon-btn icon-danger"
+                                        th:disabled="${scope.name == 'ADMIN'}"
+                                        aria-label="Удалить право [[${scope.name}]]">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" style="margin-top:1rem" aria-labelledby="create-scope">
+            <h2 id="create-scope">Создать новое право</h2>
+            <form th:action="@{/admin/scopes/new}" method="post" class="scope-form" novalidate
+                  onsubmit="return validateNewScope(this)">
+                <div class="form-group">
+                    <label for="new-scope">Название права</label>
+                    <input id="new-scope" name="scope" type="text" placeholder="Введите название права (например, READ_USERS)"
+                           required class="scope-input" aria-required="true" autofocus>
+                    <span class="small muted">Используйте понятные, структурированные имена, например <code>READ_USERS</code> или <code>MANAGE_ROLES</code>.</span>
+                </div>
+
+                <div style="margin-top:.5rem">
+                    <button type="submit" class="btn btn-primary" aria-label="Создать право">Создать право</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    function confirmDeleteScope(form, scopeName) {
+        if (scopeName === 'ADMIN') {
+            alert('Право ADMIN защищено и не может быть удалено.');
+            return false;
+        }
+        return confirm('Удалить право «' + scopeName + '»? Это действие необратимо и может повлиять на доступы пользователей.');
+    }
+
+    function validateNewScope(form) {
+        const input = form.querySelector('input[name="scope"]');
+        const v = (input.value || '').trim();
+        if (v.length < 3) {
+            alert('Введите корректное имя права (минимум 3 символа).');
+            input.focus();
+            return false;
+        }
+        input.value = v.toLowerCase();
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Управление ролями</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="roles-title">
+        <h1 id="roles-title">Управление ролями</h1>
+        <a th:href="@{/admin}" class="btn btn-ghost" role="button" aria-label="Назад к пользователям">← Назад к пользователям</a>
+    </header>
+
+    <main role="main">
+        <section class="card table-card" aria-labelledby="existing-roles">
+            <h2 id="existing-roles" class="sr-only">Существующие роли</h2>
+            <div class="table-responsive" role="region" aria-live="polite">
+                <table class="table" aria-describedby="roles-desc">
+                    <caption id="roles-desc" class="sr-only">Список ролей и действия по ним</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Название роли</th>
+                        <th scope="col">Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="role : ${roles}">
+                        <td data-label="Название роли" th:text="${role.name}">ROLE_NAME</td>
+                        <td data-label="Действия" class="actions-cell">
+                            <form th:action="@{/admin/roles/delete}" method="post" class="inline-form"
+                                  onsubmit="return confirmDeleteRole(this, '[[${role.name}]]')">
+                                <input type="hidden" name="role" th:value="${role.name}">
+                                <button
+                                        type="submit"
+                                        class="icon-btn icon-danger"
+                                        th:disabled="${role.name == 'ADMIN'}"
+                                        aria-label="Удалить роль [[${role.name}]]">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" style="margin-top:1rem" aria-labelledby="create-role">
+            <h2 id="create-role">Создать новую роль</h2>
+            <form th:action="@{/admin/roles/new}" method="post" class="role-form" novalidate
+                  onsubmit="return validateNewRole(this)">
+                <div class="form-group">
+                    <label for="new-role">Название роли</label>
+                    <input id="new-role" name="role" type="text" placeholder="Введите название роли (например, MANAGER)" required
+                           class="role-input" aria-required="true" autofocus>
+                </div>
+
+                <div style="margin-top:.5rem">
+                    <button type="submit" class="btn btn-primary" aria-label="Создать роль">Создать роль</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    function confirmDeleteRole(form, roleName) {
+        if (roleName === 'ADMIN') {
+            alert('Роль ADMIN защищена и не может быть удалена.');
+            return false;
+        }
+        return confirm('Удалить роль «' + roleName + '»? Действие необратимо.');
+    }
+
+    function validateNewRole(form) {
+        const input = form.querySelector('input[name="role"]');
+        const v = (input.value || '').trim();
+        if (v.length < 2) {
+            alert('Введите корректное имя роли (минимум 2 символа).');
+            input.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

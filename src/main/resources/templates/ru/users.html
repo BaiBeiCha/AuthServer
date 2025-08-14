@@ -1,0 +1,77 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Управление пользователями</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="users-title">
+        <h1 id="users-title">Управление пользователями</h1>
+        <nav class="admin-nav" aria-label="Навигация администратора">
+            <a th:if="${userDto.getScopes().contains('CHANGE_ROLES') || userDto.getRole().equals('ADMIN')}"
+               th:href="@{/admin/roles}" class="btn btn-ghost" role="button">Управление ролями</a>
+            <a th:if="${userDto.getScopes().contains('CHANGE_SCOPES') || userDto.getRole().equals('ADMIN')}"
+               th:href="@{/admin/scopes}" class="btn btn-ghost" role="button">Управление правами</a>
+        </nav>
+    </header>
+
+    <main role="main">
+        <section class="card table-card" aria-labelledby="all-users-heading">
+            <h2 id="all-users-heading" class="sr-only">Все пользователи</h2>
+            <div class="table-responsive" role="region" aria-live="polite">
+                <table class="table" aria-describedby="users-desc">
+                    <caption id="users-desc" class="sr-only">Список пользователей и их ролей/прав</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Имя пользователя</th>
+                        <th scope="col">Роль</th>
+                        <th scope="col">Права</th>
+                        <th scope="col">Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${allUsers}">
+                        <td data-label="Имя пользователя" th:text="${user.username}">username</td>
+                        <td data-label="Роль" th:text="${user.role.name}" class="role-cell">ROLE</td>
+                        <td data-label="Права">
+                            <div class="scope-list" aria-label="Права пользователя">
+                                <span th:each="scope : ${user.scopes}" th:text="${scope.name}"
+                                      class="scope-badge">SCOPE</span>
+                            </div>
+                        </td>
+                        <td data-label="Действия" class="actions-cell">
+                            <a th:href="@{'/admin/edit/' + ${user.username}}" class="icon-btn" title="Редактировать пользователя"
+                               aria-label="Редактировать пользователя [[${user.username}]]">✏️</a>
+
+                            <form th:action="@{/admin/delete}" method="post" class="inline-form"
+                                  onsubmit="return confirmDelete(this)" style="display:inline">
+                                <input type="hidden" name="username" th:value="${user.username}">
+                                <button type="submit" class="icon-btn icon-danger"
+                                        aria-label="Удалить пользователя [[${user.username}]]">🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    function confirmDelete(form) {
+        const who = form.querySelector('input[name="username"]')?.value || 'этого пользователя';
+        return confirm('Удалить пользователя «' + who + '»? Это действие необратимо.');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstCell = document.querySelector('.table tbody tr td');
+        if (firstCell) firstCell.setAttribute('tabindex', '-1');
+    });
+</script>
+</body>
+</html>

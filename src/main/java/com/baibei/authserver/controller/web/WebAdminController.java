@@ -1,5 +1,6 @@
 package com.baibei.authserver.controller.web;
 
+import com.baibei.authserver.config.AppConfig;
 import com.baibei.authserver.dto.UserDto;
 import com.baibei.authserver.entity.Role;
 import com.baibei.authserver.entity.Scope;
@@ -9,6 +10,7 @@ import com.baibei.authserver.service.RoleService;
 import com.baibei.authserver.service.ScopeService;
 import com.baibei.authserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +28,22 @@ public class WebAdminController {
     private final RoleService roleService;
     private final ScopeService scopeService;
     private final UserMapper userMapper;
+    private final AppConfig.Locale locale;
 
     @GetMapping
-    public String userList(Model model) {
+    public String userList(Model model, Authentication auth) {
         List<User> allUsers = userService.findAll();
+        User user = userService.findByUsername(auth.getName());
+        UserDto userDto = userMapper.toDto(user);
+
         model.addAttribute("allUsers", allUsers);
-        return "users";
+        model.addAttribute("userDto", userDto);
+
+        return switch (locale) {
+            case RU -> "ru/users";
+            case EN -> "en/users";
+            default -> "en/users";
+        };
     }
 
     @GetMapping("/edit/{username}")
@@ -55,7 +67,11 @@ public class WebAdminController {
         model.addAttribute("allScopes", allScopes);
         model.addAttribute("userScopes", userScopes);
 
-        return "edit";
+        return switch (locale) {
+            case RU -> "ru/edit";
+            case EN -> "en/edit";
+            default -> "en/edit";
+        };
     }
 
     @PostMapping("/edit/{username}")
@@ -78,6 +94,25 @@ public class WebAdminController {
         return "redirect:/admin/edit/" + user.getUsername() + "?success=UserUpdated";
     }
 
+    @PostMapping("/edit/{username}/updateScopes")
+    public String updateScopes(@PathVariable String username,
+                               @RequestParam List<String> scopes) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return "redirect:/admin?error=UserNotFound";
+        }
+
+        user.getScopes().clear();
+        for (String s : scopes) {
+            Scope scope = scopeService.findByName(s);
+            if (scope != null) {
+                user.getScopes().add(scope);
+            }
+        }
+        userService.save(user);
+        return "redirect:/admin/edit/" + user.getUsername() + "?success=UserUpdated";
+    }
+
     @PostMapping("/edit/{username}/addScopes")
     public String addScopes(@PathVariable String username,
                             @RequestParam List<String> scopes) {
@@ -85,6 +120,7 @@ public class WebAdminController {
         if (user == null) {
             return "redirect:/admin?error=UserNotFound";
         }
+        System.out.println(scopes);
         for (String scopeName : scopes) {
             Scope scope = scopeService.findByName(scopeName);
             if (scope != null) {
@@ -125,7 +161,12 @@ public class WebAdminController {
     public String rolesPage(Model model) {
         List<Role> roles = roleService.findAll();
         model.addAttribute("roles", roles);
-        return "roles";
+
+        return switch (locale) {
+            case RU -> "ru/roles";
+            case EN -> "en/roles";
+            default -> "en/roles";
+        };
     }
 
     @PostMapping("/roles/new")
@@ -149,7 +190,12 @@ public class WebAdminController {
     public String scopesPage(Model model) {
         List<Scope> scopes = scopeService.findAll();
         model.addAttribute("scopes", scopes);
-        return "scopes";
+
+        return switch (locale) {
+            case RU -> "ru/scopes";
+            case EN -> "en/scopes";
+            default -> "en/scopes";
+        };
     }
 
     @PostMapping("/scopes/new")

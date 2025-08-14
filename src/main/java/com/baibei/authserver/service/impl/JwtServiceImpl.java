@@ -2,12 +2,14 @@ package com.baibei.authserver.service.impl;
 
 import com.baibei.authserver.entity.User;
 import com.baibei.authserver.service.JwtService;
+import com.baibei.authserver.util.TimeParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import static com.baibei.authserver.entity.Scope.generateScope;
 
 import java.security.Key;
@@ -17,17 +19,18 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final String secret;
+    private final long expiration;
+    private final long refreshExpiration;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
-
-    @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration;
-
-    @Value("${app.admin.username}")
-    private String adminUsername;
+    public JwtServiceImpl(@Value("${jwt.secret}") String secret,
+                          @Value("${jwt.expiration}") String expiration,
+                          @Value("${jwt.refresh-expiration}") String refreshExpiration,
+                          TimeParser timeParser) {
+        this.secret = secret;
+        this.expiration = timeParser.parseTime(expiration);
+        this.refreshExpiration = timeParser.parseTime(refreshExpiration);
+    }
 
     @Override
     public String generateToken(User user) {

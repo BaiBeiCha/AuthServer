@@ -1,0 +1,181 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Account Settings</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header-section" role="banner" aria-labelledby="account-title">
+        <div>
+            <h1 id="account-title">Account Settings</h1>
+            <p class="small muted">Manage your personal information</p>
+        </div>
+
+        <nav class="admin-nav" aria-label="Admin navigation">
+            <a th:if="${userDto.getScopes().contains('CHANGE_ROLES') || userDto.getRole().equals('ADMIN')}"
+               th:href="@{/admin/roles}" class="btn btn-ghost" role="button">Manage Roles</a>
+            <a th:if="${userDto.getScopes().contains('CHANGE_SCOPES') || userDto.getRole().equals('ADMIN')}"
+               th:href="@{/admin/scopes}" class="btn btn-ghost" role="button">Manage Scopes</a>
+            <a th:if="${userDto.getScopes().contains('CHANGE_USERS') || userDto.getRole().equals('ADMIN')}"
+               th:href="@{/admin}" class="btn btn-ghost" role="button">Manage Users</a>
+        </nav>
+    </header>
+
+    <main class="profile-card" role="main" aria-labelledby="profile-title">
+        <header class="profile-header">
+            <h2 id="profile-title">Profile</h2>
+            <p class="profile-subtitle">Your account details</p>
+        </header>
+
+        <div th:if="${errorMessage}" class="alert alert-error" role="alert" aria-live="assertive">
+            <p th:text="${errorMessage}">There was an error</p>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success" role="status" aria-live="polite">
+            <p th:text="${successMessage}">Saved successfully</p>
+        </div>
+
+        <section aria-labelledby="profile-form-title">
+            <h3 id="profile-form-title" class="sr-only">Edit profile</h3>
+
+            <form th:action="@{/user/profile}" th:object="${userDto}" method="post" novalidate
+                  onsubmit="return validateProfile(this)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input id="username" th:field="*{username}" type="text" required autocomplete="username"
+                           aria-required="true" autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">New password <span class="input-hint">(leave empty to keep unchanged)</span></label>
+                    <div class="input-row" style="align-items:center">
+                        <input id="password" th:field="*{password}" name="password" type="password" minlength="8"
+                               placeholder="At least 8 characters" autocomplete="new-password">
+                        <button type="button" class="btn btn-ghost" onclick="togglePassword('password')"
+                                aria-label="Toggle password visibility">👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top:1rem">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <a th:href="@{ /static}" class="btn btn-ghost" style="margin-left:.5rem">Cancel</a>
+                </div>
+            </form>
+        </section>
+
+        <!-- API Access Section -->
+        <section class="api-access" aria-labelledby="api-tokens-title" style="margin-top:2rem">
+            <h3 id="api-tokens-title" class="small" style="color:var(--primary);">API Access</h3>
+            <p class="info-text">Get authorization tokens for accessing the system API</p>
+
+            <div style="margin-top:1rem">
+                <button type="button" class="btn btn-secondary" onclick="getAuthTokens()">Get Tokens</button>
+            </div>
+
+            <div id="tokens-result" style="display:none; margin-top:1rem">
+                <div class="form-group">
+                    <label for="access-token">Access Token</label>
+                    <textarea id="access-token" rows="3" class="token-area" readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="refresh-token">Refresh Token</label>
+                    <textarea id="refresh-token" rows="3" class="token-area" readonly></textarea>
+                </div>
+                <button type="button" class="btn btn-ghost" onclick="copyTokens()">Copy Tokens</button>
+            </div>
+        </section>
+
+        <section class="danger-zone" aria-labelledby="danger-title" style="margin-top:2rem">
+            <h3 id="danger-title" class="small" style="color:var(--danger)">Danger zone</h3>
+            <p class="warning-text">Deleting your account will remove all data and cannot be undone.</p>
+            <form th:action="@{/user/delete}" method="post" onsubmit="return confirmDeleteAccount(this)">
+                <button type="submit" class="btn btn-danger" aria-label="Delete account">
+                    Delete account
+                </button>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.type = el.type === 'password' ? 'text' : 'password';
+        el.focus();
+    }
+
+    function validateProfile(form) {
+        const uname = (form.username.value || '').trim();
+        const pwd = form.password ? form.password.value : '';
+        if (uname.length < 1) {
+            alert('Enter username');
+            form.username.focus();
+            return false;
+        }
+        if (pwd && pwd.length > 0 && pwd.length < 8) {
+            alert('New password must be at least 8 characters');
+            form.password.focus();
+            return false;
+        }
+        return true;
+    }
+
+    function confirmDeleteAccount(form) {
+        return confirm('Are you sure you want to delete your account? This action is irreversible.');
+    }
+
+    async function getAuthTokens() {
+        try {
+            const username = document.getElementById('username').value;
+            const password = prompt('Enter your password to get tokens:');
+
+            if (!password) return;
+
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || 'Authentication failed');
+            }
+
+            const data = await response.json();
+
+            document.getElementById('access-token').value = data.accessToken;
+            document.getElementById('refresh-token').value = data.refreshToken;
+            document.getElementById('tokens-result').style.display = 'block';
+
+            alert('Tokens retrieved successfully!');
+
+        } catch (error) {
+            console.error('Token error:', error);
+            alert(`Error getting tokens: ${error.message}`);
+        }
+    }
+
+    function copyTokens() {
+        const accessToken = document.getElementById('access-token').value;
+        const refreshToken = document.getElementById('refresh-token').value;
+        const text = `Access Token: ${accessToken}\nRefresh Token: ${refreshToken}`;
+
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                alert('Tokens copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Copy failed:', err);
+                alert('Error copying tokens');
+            });
+    }
+</script>
+</body>
+</html>
